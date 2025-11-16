@@ -5,7 +5,6 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <ncurses.h>
 
 #include "Human.h"
 #include "Logger.h"
@@ -33,30 +32,26 @@ void CHuman::Init() {
     LOG_INFOF("CHuman::Init completed with user_cursor_x=%d, user_cursor_y=%d", user_cursor_x, user_cursor_y);
 }
 
-int CHuman::ProcessUserInput(char c) {
+int CHuman::ProcessUserInput(int c) {
     switch (c)
     {
     case 'w':
     case 'W':
-    case KEY_UP:
         moveCursor(0, -1);
         break;
     
     case 's':
     case 'S':
-    case KEY_DOWN:
         moveCursor(0, 1);
         break;
     
     case 'a':
     case 'A':
-    case KEY_LEFT:
         moveCursor(-1, 0);
         break;
     
     case 'd':
     case 'D':
-    case KEY_RIGHT:
         moveCursor(1, 0);
         break;
     

@@ -493,8 +493,6 @@ void ConsoleRenderer::renderHelp (){
     std::cout << /*WHITE_BG <<*/ DFT << "A/a - Left, D/d - Right, W/w - Up, S/s - Down";
     moveCursor(HELP_LOC_X(map_height)+1,HELP_LOC_Y());
     std::cout << /*WHITE_BG <<*/ DFT << "Space - Toggle Army Movement: On / Off";
-    moveCursor(HELP_LOC_X(map_height)+2,HELP_LOC_Y());
-    std::cout << /*WHITE_BG <<*/ DFT << "The level in this game is 1~6" << DFT;
 }
 
 /// @brief shows the Bulletin Board page

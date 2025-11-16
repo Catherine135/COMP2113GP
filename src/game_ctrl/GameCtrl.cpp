@@ -5,7 +5,6 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <ncurses.h>
 
 #include "Logger.h"
 #include "GameCtrl.h"
@@ -145,27 +144,7 @@ void GameCtrl::Init() {
     human_.Init();
     ai_.init(players_[0].level);
 
-    int user_cursor_x = human_.GetCursorPosition().first;
-    int user_cursor_y = human_.GetCursorPosition().second;
-    /*
-    std::vector<std::vector<Tile>> snap = admin_.get_map().getSnapshot();
-    // guard against empty snapshot
-    if (!snap.empty() && !snap[0].empty()) {
-        // snap is indexed as snap[row][col] -> snap[y][x]
-        // iterate rows (y) then columns (x)
-        for (int y = 0; y < static_cast<int>(snap.size()); ++y) {
-            for (int x = 0; x < static_cast<int>(snap[y].size()); ++x) {
-                Tile t = snap[y][x];
-                if (t.owner == 0 && t.isCapital()) {
-                    user_cursor_x = x;
-                    user_cursor_y = y;
-                }
-            }
-        }
-    }*/
-
-    RenderTask* task = new InitGameInterface(players_[0].level, players_[0].name, user_cursor_x, user_cursor_y, admin_.get_map().getSnapshot());
-    renderer_.submit_task(task);
+    RenderInitInterface();
 }
 
 void GameCtrl::StartGame() {
@@ -259,14 +238,12 @@ void GameCtrl::ShowHelp() {
 
 bool GameCtrl::IsPlayGameKey(int c) {
     return (c == 'A' || c == 'a'|| c == 'S' || c == 's'|| c == 'D' || c == 'd'|| c == 'W' || c == 'w' ||
-            c == KEY_UP || c == KEY_DOWN || c == KEY_LEFT || c == KEY_RIGHT ||
             c == ' ');
 }
 
 bool GameCtrl::IsMenuKey(int c) {
     return (c == 'g' || c == 'G' || c == 'r' || c == 'R' || c == 'p' || c == 'P' ||
-            /*c == 'h' || c == 'H' || */c == 'q' || c == 'Q' || c == 'y' || c == 'Y' ||
-            c == 'n' || c == 'N'/* || c == 27 || c == 10*/);
+            /*c == 'h' || c == 'H' || */c == 'q' || c == 'Q'/* || c == 27 || c == 10*/);
 }
 
 int GameCtrl::ProcessUserInput(int c) {
@@ -290,6 +267,7 @@ int GameCtrl::ProcessUserInput(int c) {
         if(IsMenuKey(c)) {
             return ProcessMenuInput(c);
         }
+        RenderInitInterface();
         break;
     
     case GameState::PLAYING:
@@ -418,6 +396,9 @@ int GameCtrl::ProcessMenuInput(char c) {
             break;
     }
 
+    if (current_state_ == GameState::INIT) {
+        RenderInitInterface();
+    }
     SendMessageTask("Invalid key input in current state ...");
     return 0;
 }
@@ -583,6 +564,23 @@ void GameCtrl::SendSelectTileTask(int x, int y, bool select) {
 
 void GameCtrl::SendMessageTask(const std::string& message) {
     RenderTask* task = new ShowMsg(message);
+    renderer_.submit_task(task);
+}
+
+void GameCtrl::RenderInitInterface() {
+    if (players_.empty()) {
+        LOG_ERROR("RenderInitInterface called with no players available.");
+        return;
+    }
+
+    int user_cursor_x = human_.GetCursorPosition().first;
+    int user_cursor_y = human_.GetCursorPosition().second;
+    RenderTask* task = new InitGameInterface(
+        players_[0].level,
+        players_[0].name,
+        user_cursor_x,
+        user_cursor_y,
+        admin_.get_map().getSnapshot());
     renderer_.submit_task(task);
 }
 /*

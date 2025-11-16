@@ -126,6 +126,7 @@ int main() {
         new_t.c_lflag &= ~(ICANON | ECHO); // disable echo and canonical mode
         tcsetattr(STDIN_FILENO, TCSANOW, &new_t);*/
         initscr(); // init ncurses mode
+        // set_escdelay(25);
         keypad(stdscr, TRUE); // start enabling function keys (including arrow keys)
         noecho(); // Don't echo input characters on the screen
         gameCtrl->Init();
@@ -140,7 +141,37 @@ int main() {
             FD_ZERO(&fds);
             FD_SET(STDIN_FILENO, &fds);
             if (select(STDIN_FILENO + 1, &fds, NULL, NULL, NULL) > 0) { // &tv
-                int c = getchar();
+                int c = getch();
+                // Ignore Director keys by reading extra bytes when encountered with ESC or [
+                if (c == 27) { // ESC key
+                    nodelay(stdscr, TRUE); // set non-blocking
+                    int next1 = getch();
+                    if (next1 == '[') {
+                        int next2 = getch(); // read the next char
+                        // Discard the sequence
+                        LOG_INFOF("Ignored Director key sequence: ESC [ %c", next2);
+                        nodelay(stdscr, FALSE); // restore blocking
+                        continue;
+                    } else {
+                        // Not a Director key, process ESC normally
+                        ungetch(next1); // put back the char for normal processing
+                        nodelay(stdscr, FALSE); // restore blocking
+                    }
+                } else if (c == '[') {
+                    nodelay(stdscr, TRUE); // set non-blocking
+                    int next1 = getch();
+                    if (next1 >= 'A' && next1 <= 'D') {
+                        // Discard the sequence
+                        LOG_INFOF("Ignored Director key sequence: [ %c", next1);
+                        nodelay(stdscr, FALSE); // restore blocking
+                        continue;
+                    } else {
+                        // Not a Director key, process [ normally
+                        ungetch(next1); // put back the char for normal processing
+                        nodelay(stdscr, FALSE); // restore blocking
+                    }
+                }
+
                 int ret = gameCtrl->ProcessUserInput(c);
                 LOG_INFOF("GameCtrl input processed: %c ret-%d", c, ret);
                 if (ret == 1) // human game input

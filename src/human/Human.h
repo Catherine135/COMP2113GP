@@ -47,7 +47,7 @@ public:
     }
     
     // User input processing
-    int ProcessUserInput(char c);
+    int ProcessUserInput(int c);
 
 private:
     //void HandleChatInput();

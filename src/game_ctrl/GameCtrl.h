@@ -95,6 +95,7 @@ private:
     bool IsMenuKey(int c);
 
     int ProcessMenuInput(char c);
+    void RenderInitInterface();
 
     // Game state management
     void SetGameState(GameState state);
