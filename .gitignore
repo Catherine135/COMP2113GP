@@ -1,3 +1,5 @@
 .vscode/
 build/
 game.log
+.DS_Store
+__MACOSX/
