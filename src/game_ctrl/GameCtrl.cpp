@@ -216,7 +216,9 @@ void GameCtrl::RestartGame() {
 
 void GameCtrl::PauseGame() {
     SetGameState(GameState::PAUSED);
+    // Pause both AI and Admin so ticks and army growth stop during pause
     ai_.pause(); 
+    admin_.pause();
     SendMessageTask("Game paused");
 }
 
@@ -230,7 +232,8 @@ void GameCtrl::ResumeGame() {
     RenderTask* task = new StartGameInterface(players_[0].level, players_[0].name, user_cursor_x, user_cursor_y, admin_.get_map().getSnapshot());
     renderer_.submit_task(task);
 
-    // Resume AI
+    // Resume both Admin and AI so the game continues ticking
+    admin_.resume();
     ai_.resume(); 
 
     SendMessageTask("Resuming game...");

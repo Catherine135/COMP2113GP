@@ -194,7 +194,7 @@ void ConsoleRenderer::renderArrow(const Arrow& task) {
     }
     else if ((x0 - x1 == -1) && (y0 == y1)){
         int row = LAND_HEIGHT * y0 + MAP_LOC_X();
-        int col = x0 * LAND_WIDTH + MAP_LOC_Y() + LAND_WIDTH - 2;//3;
+        int col = x0 * LAND_WIDTH + MAP_LOC_Y() + LAND_WIDTH - 1;//3;
         moveCursor(row,col);
         if (task.draw){std::cout << arrow_color << ">";} 
         else {std::cout << " ";}
@@ -437,7 +437,7 @@ void ConsoleRenderer::updateHumanCursor (std::pair<int, int> to, bool bSelected,
     Tile tile = snapshot[user_cursor_y][user_cursor_x];
     int x1 = static_cast<int>(to.first);
     int y1 = static_cast<int>(to.second);
-    LOG_DEBUGF("user_cursor_x-%d,user_cursor_y-%d, row-%d, col-%d, tile.owner-%d, army-%d, landType-%d, to.x-%d, to.y-%d",
+    LOG_DEBUGF("user_cursor_x-%d,user_cursor_y-%d, tile.owner-%d, army-%d, landType-%d, to.x-%d, to.y-%d",
         user_cursor_x, user_cursor_y, tile.owner, tile.army, static_cast<int>(tile.landType), x1, y1);
 
     // erase cur cursor

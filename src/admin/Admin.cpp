@@ -67,7 +67,8 @@ void Admin::apply_move(const Move& m, int player) {
             m.to.first, m.to.second);
         return;
     }
-    int movable = std::min(m.army, src.army <= 1 ? 0 : src.army - 1);
+    //int movable = std::min(m.army, src.army <= 1 ? 0 : src.army - 1);
+    int movable = (src.army <= 1 ? 0 : src.army - 1);
     if (movable <= 0) {
         LOG_INFOF("No movable armies for move from (%d,%d) to (%d,%d)", 
             m.from.first, m.from.second, m.to.first, m.to.second);
@@ -79,12 +80,42 @@ void Admin::apply_move(const Move& m, int player) {
     newSrc.army -= movable;
     map.setTile(m.from.first, m.from.second, newSrc);
 
-    if (dst.owner == -1 || dst.owner == player) {
-        // move into neutral or own tile: add armies
+    if (dst.owner == player) {
+        // Move into own tile: merge armies
         Tile newDst = dst;
         newDst.owner = player;
         newDst.army += movable;
         map.setTile(m.to.first, m.to.second, newDst);
+        LOG_INFOF("Merged into own tile at (%d,%d), new army %d", m.to.first, m.to.second, newDst.army);
+    } else if (dst.owner == -1) {
+        // Neutral tile
+        if (dst.isCity()) {
+            // Correct rule: battle with neutral city garrison (simple subtraction)
+            LOG_INFOF("Attacking neutral city at (%d,%d): atk %d vs def %d", 
+                m.to.first, m.to.second, movable, dst.army);
+            if (movable > dst.army) {
+                int survivors = movable - dst.army; // no +1 penalty for neutral city
+                Tile newDst = dst;
+                newDst.owner = player;
+                newDst.army = survivors;
+                map.setTile(m.to.first, m.to.second, newDst);
+                LOG_INFOF("Captured neutral city at (%d,%d) with %d survivors", m.to.first, m.to.second, survivors);
+            } else {
+                // Defender (neutral) holds or tie -> defender wins; remaining defenders decrease
+                Tile newDst = dst;
+                newDst.army = dst.army - movable; // tie -> 0
+                // owner stays -1 (neutral)
+                map.setTile(m.to.first, m.to.second, newDst);
+                LOG_INFOF("Neutral city holds at (%d,%d), remaining defenders %d", m.to.first, m.to.second, newDst.army);
+            }
+        } else {
+            // Neutral non-city ground: claim and add armies
+            Tile newDst = dst;
+            newDst.owner = player;
+            newDst.army += movable;
+            map.setTile(m.to.first, m.to.second, newDst);
+            LOG_INFOF("Claimed neutral tile at (%d,%d), army %d", m.to.first, m.to.second, newDst.army);
+        }
     } else {
         // enemy encounter rule: winner loses (loser + 1)
         if (movable > dst.army) {

@@ -9,6 +9,7 @@
 #include <sstream>
 #include <vector>
 #include <ncurses.h>
+#include <memory>
 
 #include "Logger.h"
 #include "Map.h"
@@ -99,12 +100,15 @@ int main() {
     renderer.start();
     Admin admin(renderer, player.level); //map_width, map_height, map_seed);
     admin.start();
-    GameAI ai(admin, 1);
-    ai.start();
+    // Choose AI implementation based on player level while preserving GameAI interface
+    std::unique_ptr<GameAI> ai;
+    if (player.level <= 1) ai = std::make_unique<RandomAI>(admin, 1);
+    else ai = std::make_unique<HeuristicAI>(admin, 1);
+    ai->start();
     CHuman human(admin, renderer);
     //GameCtrl gameCtrl(admin, renderer, ai, human);
     //gameCtrl.AddPlayer(player);
-    auto gameCtrl = std::make_unique<GameCtrl>(admin, renderer, ai, human);
+    auto gameCtrl = std::make_unique<GameCtrl>(admin, renderer, *ai, human);
     gameCtrl->AddPlayer(player);
 
     std::cout << "Hello, " << player.name << "! Preparing to start the game..." << std::endl;
@@ -160,7 +164,7 @@ int main() {
     }
 
     // stop all
-    ai.stop();
+    ai->stop();
     admin.stop();
     renderer.stop();
 

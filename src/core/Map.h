@@ -34,6 +34,17 @@ public:
     /// @param level Difficulty level for map generation.
     void regenerateMap(int level);
 
+    /// Control whether map generation is reproducible with a fixed seed.
+    /// If enabled, all subsequent generations will use the provided seed.
+    /// Call this before regenerateMap to take effect.
+    void setDeterministic(bool enable, int fixed = 0) {
+        deterministic = enable;
+        fixedSeed = fixed;
+    }
+
+    /// Get current random seed used for the last generation.
+    int getSeed() const noexcept { return seed; }
+
     /// Get the tile at the specified coordinates.
     /// @param x X coordinate.
     /// @param y Y coordinate.
@@ -59,6 +70,10 @@ private:
     int seed;
     std::vector<std::vector<Tile>> tiles;
     mutable std::shared_mutex mapMutex;
+
+    // Reproducibility control
+    bool deterministic{false};
+    int fixedSeed{0};
 
     /// Generate the map using the specified seed and DFS algorithm.
     /// @param seed Random seed for map generation.
