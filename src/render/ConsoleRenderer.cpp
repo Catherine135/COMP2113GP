@@ -8,7 +8,7 @@
 #include "ConsoleRenderer.h"
 #include "Logger.h"
 
-#define SHOW_AI_TILES true /* show AI tiles */
+#define SHOW_AI_TILES false /* show AI tiles */
 
 #define DFT "\033[0m" /* reset */
 #define RED_BG "\033[41m" /* red background */
@@ -389,7 +389,7 @@ void ConsoleRenderer::renderInitGameInterface (const InitGameInterface& task){
     
     renderGameLogo(map_width);
     moveCursor(WELCOME_LOC_X(),WELCOME_LOC_Y(map_width));
-    std::cout << BLUE << " *********** Welcome to GENERALS.AI, a human vs AI board game ************** " << DFT;
+    std::cout << BLUE << " *********** Welcome to GENERAIS.AI, a human vs AI board game ************** " << DFT;
     //std::vector<std::vector<Tile>> snapToRender;
     //int tiles_w = task.snapshot[0].size();
     //int tiles_h = task.snapshot.size();
@@ -648,7 +648,7 @@ void ConsoleRenderer::renderEndGameInterface (const EndGameInterface& task){
     moveCursor(WIN_MESSAGE_LOC_X(), WIN_MESSAGE_LOC_Y(map_width));
     std::cout << YELLOW_BG << " ---------------------------------------- ";
     moveCursor(WIN_MESSAGE_LOC_X()+1, WIN_MESSAGE_LOC_Y(map_width));
-    std::cout <<     " |              Good job!               | "; 
+    std::cout <<     " |              Game End!               | "; 
     moveCursor(WIN_MESSAGE_LOC_X()+2, WIN_MESSAGE_LOC_Y(map_width));
     if (task.isWinning){
         std::cout << " |              You win!                | ";
@@ -662,7 +662,12 @@ void ConsoleRenderer::renderEndGameInterface (const EndGameInterface& task){
     moveCursor(WIN_MESSAGE_LOC_X()+5, WIN_MESSAGE_LOC_Y(map_width));
     std::cout << " |Press Q/q to exit!                    | ";
     moveCursor(WIN_MESSAGE_LOC_X()+6, WIN_MESSAGE_LOC_Y(map_width));
-    std::cout << " |Press R/r to start next level!        | ";
+    if (task.isWinning){
+        std::cout << " |Press R/r to start next level!        | ";
+    } else {
+        std::cout << " |Press R/r to retry this level!        | ";
+    }
+    //std::cout << " |Press R/r to start next level!        | ";
     moveCursor(WIN_MESSAGE_LOC_X()+7, WIN_MESSAGE_LOC_Y(map_width));
     std::cout << " ---------------------------------------- ";
 

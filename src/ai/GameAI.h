@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <random> 
 #include <chrono>
+#include <map>
 #include "Map.h"
 #include "Action.h"
 #include "Admin.h" 
@@ -69,12 +70,40 @@ protected:
     Move pickMove(const std::vector<std::vector<Tile>>& snap) override;
 };
 
-class GreedyFrontierAI : public GameAI {
+// ExpanderAI: prioritize capturing opponent tiles, then neutral expansion; otherwise random valid move
+class ExpanderAI : public GameAI {
 public:
     using GameAI::GameAI;
 
 protected:
     Move pickMove(const std::vector<std::vector<Tile>>& snap) override;
+};
+
+class GreedyFrontierAI : public GameAI {
+public:
+    using GameAI::GameAI;
+    void onMoveSubmitted(const Move& m) override; // track movement history
+
+protected:
+    Move pickMove(const std::vector<std::vector<Tile>>& snap) override;
+
+private:
+    Move planAssault(const std::vector<std::vector<Tile>>& snap, std::pair<int,int> enemyCapital);
+    void scheduleNextAssault();
+    int drawAssaultSpacing();
+    int bigArmyThreshold() const; // slowly increases with turns
+    int reserveFor(const Tile& tile) const;
+    int movableArmy(const Tile& tile) const;
+    std::pair<int,int> locateEnemyCapital(const std::vector<std::vector<Tile>>& snap) const;
+    std::pair<int,int> pickRallyTarget(const std::vector<std::vector<Tile>>& snap) const;
+    Move planStackingMove(const std::vector<std::vector<Tile>>& snap, std::pair<int,int> rally);
+    Move planNudgeFrom(const std::vector<std::vector<Tile>>& snap, std::pair<int,int> src, std::pair<int,int> rally);
+
+    int turnCounter{0};
+    int nextAssaultTurn{0};
+    std::mt19937 assaultRng{std::random_device{}()};
+    // Track last turn a tile's occupying force moved (by destination)
+    std::map<std::pair<int,int>, int> lastMovedTurnByPos;
 };
 
 // Alias for existing usage in main.cpp (can extend with new heuristics later)

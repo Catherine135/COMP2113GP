@@ -18,7 +18,7 @@
 #include "Human.h"
 
 #ifndef MAX_GAME_LEVEL
-#define MAX_GAME_LEVEL 6
+#define MAX_GAME_LEVEL 4
 #endif
 
 // Game Status Enumeration

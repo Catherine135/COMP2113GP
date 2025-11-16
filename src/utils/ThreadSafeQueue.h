@@ -8,7 +8,7 @@ template <typename T>
 class ThreadSafeQueue {
 public:
     void push(const T& value) {
-        if (discard) return;          // 丢弃模式：新任务直接拒收
+        if (discard) return;          // Discard mode, do not accept new tasks
         {
             std::lock_guard<std::mutex> lk(mtx);
             q.push(value);
@@ -34,7 +34,6 @@ public:
         return true;
     }
 
-    // ===== 优雅停机（消费完）=====
     void stop() {
         {
             std::lock_guard<std::mutex> lk(mtx);
@@ -43,16 +42,14 @@ public:
         cv.notify_all();
     }
 
-    // ===== 强制停机（丢弃剩余）=====
     void stop_now() {
         {
             std::lock_guard<std::mutex> lk(mtx);
-            discard = true;   // 进入丢弃模式
-            // 清空已有任务
+            discard = true; 
             std::queue<T> empty;
             std::swap(q, empty);
         }
-        cv.notify_all();      // 唤醒所有阻塞线程
+        cv.notify_all();
     }
 
     bool empty() const {
@@ -65,5 +62,5 @@ private:
     std::condition_variable cv;
     std::queue<T> q;
     bool stopped{false};
-    bool discard{false};   // 强制丢弃标志
+    bool discard{false};  
 };

@@ -103,7 +103,9 @@ int main() {
     // Choose AI implementation based on player level while preserving GameAI interface
     std::unique_ptr<GameAI> ai;
     if (player.level <= 1) ai = std::make_unique<RandomAI>(admin, 1);
-    else ai = std::make_unique<HeuristicAI>(admin, 1);
+    else if (player.level == 2) ai = std::make_unique<HeuristicAI>(admin, 1);
+    else if (player.level == 3) ai = std::make_unique<ExpanderAI>(admin, 1); // new ExpanderAI for level 3
+    else /* level >=4 */ ai = std::make_unique<HeuristicAI>(admin, 1);
     ai->start();
     CHuman human(admin, renderer);
     //GameCtrl gameCtrl(admin, renderer, ai, human);
@@ -168,6 +170,6 @@ int main() {
     admin.stop();
     renderer.stop();
 
-    std::cout << "Happy every day! Bye:)" << std::endl;
+    std::cout << "What a fight! You are a good Jeo." << std::endl;
     return 0;
 }
