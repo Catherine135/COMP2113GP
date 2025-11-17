@@ -1,10 +1,13 @@
 #include <algorithm>
+#include <array>
+#include <deque>
 #include <queue>
 #include <random>
 #include <mutex>
 #include <chrono>
 #include <stack>
 #include <numeric>
+#include <limits>
 
 #include "Map.h"
 #include "Logger.h"
@@ -67,14 +70,69 @@ void Map::generateMap(int s) {
     // Maze-based generator with optional reproducibility
     std::mt19937 rng(s);
 
+    const std::array<std::pair<int,int>, 4> dirs{{{ -1,0 }, { 1,0 }, { 0,-1 }, { 0,1 }}};
+
     // Common helpers
     auto inb = [&](int x, int y){ return x>=0 && x<width && y>=0 && y<height; };
     auto isMountain = [&](int x, int y){ return tiles[y][x].landType == LANDTYPE::MOUNTAIN; };
     auto isPassable = [&](int x, int y){ return tiles[y][x].landType != LANDTYPE::MOUNTAIN; };
     auto setNormalEmpty = [&](int x, int y){ tiles[y][x].landType = LANDTYPE::NORMAL; tiles[y][x].owner = -1; tiles[y][x].army = 0; };
     auto hasPassNeighbor = [&](int x, int y){
-        return (x>0 && isPassable(x-1,y)) || (x+1<width && isPassable(x+1,y)) ||
-               (y>0 && isPassable(x,y-1)) || (y+1<height && isPassable(x,y+1));
+        for (auto [dx, dy] : dirs) {
+            int nx = x + dx, ny = y + dy;
+            if (inb(nx, ny) && isPassable(nx, ny)) return true;
+        }
+        return false;
+    };
+    auto ensure_capital_path = [&](){
+        std::vector<std::pair<int,int>> capitals;
+        for (int y = 0; y < height; ++y)
+            for (int x = 0; x < width; ++x)
+                if (tiles[y][x].landType == LANDTYPE::CAPITAL)
+                    capitals.emplace_back(x,y);
+        if (capitals.size() != 2) return;
+
+        const int total = width * height;
+        auto idx = [&](int x, int y){ return y * width + x; };
+        const int INF = std::numeric_limits<int>::max();
+        std::vector<int> dist(total, INF);
+        std::vector<int> prev(total, -1);
+        std::deque<int> dq;
+        int startIdx = idx(capitals[0].first, capitals[0].second);
+        int targetIdx = idx(capitals[1].first, capitals[1].second);
+        dist[startIdx] = 0;
+        dq.push_back(startIdx);
+
+        while (!dq.empty()) {
+            int cur = dq.front(); dq.pop_front();
+            if (cur == targetIdx) break;
+            int cx = cur % width;
+            int cy = cur / width;
+            for (auto [dx, dy] : dirs) {
+                int nx = cx + dx, ny = cy + dy;
+                if (!inb(nx, ny)) continue;
+                int nidx = idx(nx, ny);
+                int cost = tiles[ny][nx].landType == LANDTYPE::MOUNTAIN ? 1 : 0;
+                if (dist[cur] != INF && dist[cur] + cost < dist[nidx]) {
+                    dist[nidx] = dist[cur] + cost;
+                    prev[nidx] = cur;
+                    if (cost == 0) dq.push_front(nidx);
+                    else dq.push_back(nidx);
+                }
+            }
+        }
+
+        if (dist[targetIdx] == INF || dist[targetIdx] == 0) return;
+
+        int cur = targetIdx;
+        while (cur != -1) {
+            int px = cur % width;
+            int py = cur / width;
+            if (tiles[py][px].landType == LANDTYPE::MOUNTAIN) {
+                setNormalEmpty(px, py);
+            }
+            cur = prev[cur];
+        }
     };
 
     bool capitalsPlaced = false;
@@ -87,17 +145,16 @@ void Map::generateMap(int s) {
     };
 
     auto ensure_capital_has_empty_neighbor = [&](int px, int py) {
-        const int dirs[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
-        for (auto &d : dirs) {
-            int nx = px + d[0], ny = py + d[1];
+        for (auto [dx, dy] : dirs) {
+            int nx = px + dx, ny = py + dy;
             if (inb(nx, ny) && tiles[ny][nx].landType == LANDTYPE::NORMAL) return; // already ok
         }
-        for (auto &d : dirs) { // open mountain first
-            int nx = px + d[0], ny = py + d[1];
+        for (auto [dx, dy] : dirs) { // open mountain first
+            int nx = px + dx, ny = py + dy;
             if (inb(nx, ny) && isMountain(nx, ny)) { setNormalEmpty(nx, ny); return; }
         }
-        for (auto &d : dirs) { // else convert a city
-            int nx = px + d[0], ny = py + d[1];
+        for (auto [dx, dy] : dirs) { // else convert a city
+            int nx = px + dx, ny = py + dy;
             if (inb(nx, ny) && tiles[ny][nx].landType == LANDTYPE::CITY) { setNormalEmpty(nx, ny); return; }
         }
     };
@@ -248,6 +305,8 @@ void Map::generateMap(int s) {
             place_capital(1, x2, y2); ensure_capital_has_empty_neighbor(x2, y2);
         }
     }
+
+    ensure_capital_path();
 
     // 5) Normalize neutral city count to ~5% of map size
     {
