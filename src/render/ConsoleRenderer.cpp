@@ -16,9 +16,12 @@
 #define YELLOW_BG "\033[43m" /* yellow background */
 #define CYAN_BG "\033[46m" /* cyan background */
 #define WHITE_BG "\033[47m" /* white background */
+#define LIGHT_RED_BG "\033[101m" /* light red background */
+#define DARK_GRAY_BG "\033[100m" /* dark gray background */
 #define RED "\033[31m" /* red */
 #define BLUE "\033[34m" /* blue */
 #define BLACK "\033[30m" /* black */
+#define WHITE "\033[37m" /* white */
 #define CLEAR "\033c"
 #define HUMAN_ARROW "\033[31m" /* red */
 #define HUMAN_RED "\033[31m" /* red */
@@ -277,7 +280,8 @@ void ConsoleRenderer::renderRefreshMap(const std::vector<std::vector<Tile>>& sna
                 std::cout << WHITE_BG << ' ' << std::string(LAND_WIDTH-2, ' ');
             } else {
                 if (tile.isMountain()) {
-                    std::cout << WHITE_BG << BLACK << getTileSymbol(tile) << std::string(LAND_WIDTH-2, ' ');
+                    // Mountains: dark gray background with white text
+                    std::cout << DARK_GRAY_BG << WHITE << getTileSymbol(tile) << std::string(LAND_WIDTH-2, ' ');
                 } 
                 else if (bInit) {
                     std::cout << WHITE_BG << BLACK << std::string(LAND_WIDTH-1, ' ');
@@ -296,7 +300,13 @@ void ConsoleRenderer::renderRefreshMap(const std::vector<std::vector<Tile>>& sna
                         std::cout << WHITE_BG << BLACK << getTileSymbol(tile) << armyStr; 
                     }
                 } else {
-                    std::cout << WHITE_BG << BLACK << getTileSymbol(tile) << std::string(LAND_WIDTH-2, ' ');
+                    // Visible plain land: light red background; others stay white background
+                    char sym = getTileSymbol(tile);
+                    if (sym == '.') {
+                        std::cout << LIGHT_RED_BG << BLACK << sym << std::string(LAND_WIDTH-2, ' ');
+                    } else {
+                        std::cout << WHITE_BG << BLACK << sym << std::string(LAND_WIDTH-2, ' ');
+                    }
                 }
             }
 
@@ -341,7 +351,10 @@ void ConsoleRenderer::renderUpdateTile(const UpdateTile& task) {
         // render empty cell (preserve layout)
         std::cout << WHITE_BG << ' ' << std::string(LAND_WIDTH-2, ' ');
     } else {
-    if (task.tile.isMountain()){std::cout << WHITE_BG << BLACK << getTileSymbol(task.tile) << std::string(LAND_WIDTH-2, ' ');} 
+        if (task.tile.isMountain()){
+            // Mountains: dark gray background with white text
+            std::cout << DARK_GRAY_BG << WHITE << getTileSymbol(task.tile) << std::string(LAND_WIDTH-2, ' ');
+        } 
         else if (task.tile.army){
             // format army count: cap display at "99+" when >= 1000, right-align into LAND_WIDTH-2
             std::string armyStr = (task.tile.army >= 1000) ? std::string("99+") : std::to_string(task.tile.army);
@@ -350,7 +363,13 @@ void ConsoleRenderer::renderUpdateTile(const UpdateTile& task) {
             else if (task.tile.owner == 0){std::cout << GREEN_BG << BLACK << getTileSymbol(task.tile) << armyStr; }
             else {std::cout << WHITE_BG << BLACK << getTileSymbol(task.tile) << armyStr; }
         } else {
-            std::cout << WHITE_BG << BLACK << getTileSymbol(task.tile) << std::string(LAND_WIDTH-2, ' ');
+            // Visible plain land: light red background; others stay white background
+            char sym = getTileSymbol(task.tile);
+            if (sym == '.') {
+                std::cout << LIGHT_RED_BG << BLACK << sym << std::string(LAND_WIDTH-2, ' ');
+            } else {
+                std::cout << WHITE_BG << BLACK << sym << std::string(LAND_WIDTH-2, ' ');
+            }
         }
     }
 
@@ -361,17 +380,17 @@ void ConsoleRenderer::renderUpdateTile(const UpdateTile& task) {
 
 void ConsoleRenderer::renderGameLogo (int map_width) {
     moveCursor(LOGO_LOC_X(),LOGO_LOC_Y(map_width));
-    std::cout << " ██████╗ ███████╗███╗   ██╗███████╗██████╗  █████╗ ██╗███████╗    █████╗ ██╗";
+    std::cout << " ██████╗ ███████╗███╗   ██╗███████╗██████╗  █████╗ ██╗     ███████╗    █████╗ ██╗";
     moveCursor(LOGO_LOC_X()+1,LOGO_LOC_Y(map_width));
-    std::cout << "██╔════╝ ██╔════╝████╗  ██║██╔════╝██╔══██╗██╔══██╗██║██╔════╝   ██╔══██╗██║";
+    std::cout << "██╔════╝ ██╔════╝████╗  ██║██╔════╝██╔══██╗██╔══██╗██║     ██╔════╝   ██╔══██╗██║";
     moveCursor(LOGO_LOC_X()+2,LOGO_LOC_Y(map_width));
-    std::cout << "██║  ███╗█████╗  ██╔██╗ ██║█████╗  ██████╔╝███████║██║███████╗   ███████║██║";
+    std::cout << "██║  ███╗█████╗  ██╔██╗ ██║█████╗  ██████╔╝███████║██║     ███████╗   ███████║██║";
     moveCursor(LOGO_LOC_X()+3,LOGO_LOC_Y(map_width));
-    std::cout << "██║   ██║██╔══╝  ██║╚██╗██║██╔══╝  ██╔══██╗██╔══██║██║╚════██║   ██╔══██║██║";
+    std::cout << "██║   ██║██╔══╝  ██║╚██╗██║██╔══╝  ██╔══██╗██╔══██║██║     ╚════██║   ██╔══██║██║";
     moveCursor(LOGO_LOC_X()+4,LOGO_LOC_Y(map_width));
-    std::cout << "╚██████╔╝███████╗██║ ╚████║███████╗██║  ██║██║  ██║██║███████║██╗██║  ██║██║";
+    std::cout << "╚██████╔╝███████╗██║ ╚████║███████╗██║  ██║██║  ██║███████╗███████║██╗██║  ██║██║";
     moveCursor(LOGO_LOC_X()+5,LOGO_LOC_Y(map_width));
-    std::cout << " ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚══════╝╚═╝╚═╝  ╚═╝╚═╝";
+    std::cout << " ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝╚═╝  ╚═╝╚═╝";
     std::cout << DFT;
 }
 
@@ -389,7 +408,7 @@ void ConsoleRenderer::renderInitGameInterface (const InitGameInterface& task){
     
     renderGameLogo(map_width);
     moveCursor(WELCOME_LOC_X(),WELCOME_LOC_Y(map_width));
-    std::cout << BLUE << " *********** Welcome to GENERAIS.AI, a human vs AI board game ************** " << DFT;
+    std::cout << BLUE << " **************Welcome to GENERALS.AI, a human vs AI board game***************** " << DFT;
     //std::vector<std::vector<Tile>> snapToRender;
     //int tiles_w = task.snapshot[0].size();
     //int tiles_h = task.snapshot.size();
@@ -490,9 +509,9 @@ void ConsoleRenderer::renderHelpInterface (const HelpInterface& task){
 
 void ConsoleRenderer::renderHelp (){
     moveCursor(HELP_LOC_X(map_height),HELP_LOC_Y());
-    std::cout << /*WHITE_BG <<*/ DFT << "A/a - Left, D/d - Right, W/w - Up, S/s - Down";
-    moveCursor(HELP_LOC_X(map_height)+1,HELP_LOC_Y());
-    std::cout << /*WHITE_BG <<*/ DFT << "Space - Toggle Army Movement: On / Off";
+    std::cout << /*WHITE_BG <<*/ DFT << "A/a - Left, D/d - Right, W/w - Up, S/s - Down, Space - Select/Unselect Tile";
+    //moveCursor(HELP_LOC_X(map_height)+1,HELP_LOC_Y());
+    //std::cout << /*WHITE_BG <<*/ DFT << "Space - Toggle Army Movement: On / Off";
 }
 
 /// @brief shows the Bulletin Board page
@@ -591,9 +610,21 @@ void ConsoleRenderer::renderMenu(){
     moveCursor(MENU_LOC_X()+3,MENU_LOC_Y());
     std::cout << " P/p: Pause/Resume";
     moveCursor(MENU_LOC_X()+4,MENU_LOC_Y());
-    //std::cout << " H/h: Show/Hide Help";
-    //moveCursor(MENU_LOC_X()+5,MENU_LOC_Y());
-    std::cout << " Q/q: Quit" << DFT;
+    std::cout << " Q/q: Quit";
+    moveCursor(MENU_LOC_X()+5,MENU_LOC_Y());
+    std::cout << "======= Legends =======";
+    moveCursor(MENU_LOC_X()+6,MENU_LOC_Y());
+   std::cout << " Red : Your Army";
+    moveCursor(MENU_LOC_X()+7,MENU_LOC_Y());
+    std::cout << " Green : AI's Army";
+    moveCursor(MENU_LOC_X()+8,MENU_LOC_Y());
+    std::cout << " ^ : Mountains";
+    moveCursor(MENU_LOC_X()+9,MENU_LOC_Y());
+    std::cout << " C : Capital";
+    moveCursor(MENU_LOC_X()+10,MENU_LOC_Y());
+    std::cout << " c : City";
+    moveCursor(MENU_LOC_X()+11,MENU_LOC_Y());
+    std::cout << " . : Plain Lands Visible" << DFT;
 }
 
 /// @brief shows the ConfirmExit page
