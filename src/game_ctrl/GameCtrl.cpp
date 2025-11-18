@@ -219,8 +219,28 @@ void GameCtrl::ResumeGame() {
 }
 
 void GameCtrl::ConfirmExit() {
+    GameState previous_state = current_state_;
     SetGameState(GameState::QUITTING);
     ai_.pause();
+    admin_.pause();
+
+    // Keep the existing interface visible (especially before game start) by
+    // re-rendering the current screen before overlaying the confirmation text.
+    if (!players_.empty()) {
+        if (previous_state == GameState::INIT) {
+            RenderInitInterface();
+        } else if (previous_state == GameState::PLAYING || previous_state == GameState::PAUSED) {
+            int user_cursor_x = human_.GetCursorPosition().first;
+            int user_cursor_y = human_.GetCursorPosition().second;
+            RenderTask* redraw = new StartGameInterface(
+                players_[0].level,
+                players_[0].name,
+                user_cursor_x,
+                user_cursor_y,
+                admin_.get_map().getSnapshot());
+            renderer_.submit_task(redraw);
+        }
+    }
 
     RenderTask* task = new ConfirmExitInterface();
     renderer_.submit_task(task);

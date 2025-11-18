@@ -56,6 +56,12 @@ void saveUsers(const std::string& filename, const std::vector<PlayerInfo>& users
     file.close();
 }
 
+// Disable the terminal's alternate screen buffer so the drawn UI persists after exit
+void ensureMainScreenBuffer() {
+    std::cout << "\033[?1049l";
+    std::cout.flush();
+}
+
 int main() {
     bool b_start_game = false;
     bool b_exit_game = false;
@@ -126,6 +132,7 @@ int main() {
         new_t.c_lflag &= ~(ICANON | ECHO); // disable echo and canonical mode
         tcsetattr(STDIN_FILENO, TCSANOW, &new_t);*/
         initscr(); // init ncurses mode
+        ensureMainScreenBuffer(); // keep rendering on the primary screen buffer
         // set_escdelay(25);
         keypad(stdscr, TRUE); // start enabling function keys (including arrow keys)
         noecho(); // Don't echo input characters on the screen
@@ -193,13 +200,15 @@ int main() {
                 break;
             }
         }
-        endwin(); // End ncurses mode
     }
 
     // stop all
     ai->stop();
     admin.stop();
     renderer.stop();
+
+    // End ncurses mode after renderer fully stops to keep UI intact until exit
+    endwin();
 
     std::cout << "What a fight! You are a good Jeo." << std::endl;
     return 0;
