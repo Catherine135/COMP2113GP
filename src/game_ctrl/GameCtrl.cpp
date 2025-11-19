@@ -291,7 +291,7 @@ int GameCtrl::ProcessUserInput(int c) {
         break;
     
     case GameState::PLAYING:
-        if (IsPlayGameKey(c)) { // 方向键盘、空格键，为游戏操作键
+        if (IsPlayGameKey(c)) {
             return 1; // Let human handle game input
         } else if (IsMenuKey(c)) {
             return ProcessMenuInput(c);
