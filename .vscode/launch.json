@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/wangziling/Desktop/Y2S1/COMP2113/COMP2113GP",
+      "program": "/Users/wangziling/Desktop/Y2S1/COMP2113/COMP2113GP/build/Debug/outDebug"
+    }
+  ]
+}
