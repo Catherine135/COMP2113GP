@@ -13,10 +13,11 @@ sudo apt install libncurses5-dev
 For MacOS and Ubuntu users, the `ncurses` library should already be included in the standard libraries. Running the following commands in your terminal will build the project:
 
 ```bash
+git clone https://github.com/Catherine135/COMP2113GP && cd COMP2113GP
 make -j4
 ```
 
-Run the following command to start the game:
+Run the following command to start the game after a successful build:
 
 ```bash
 ./build/generals_ai
