@@ -16,16 +16,66 @@ enum class LogLevel {
 
 class Logger {
 public:
+    /**
+     * @Michael-wzl
+     * @brief Get the singleton instance of the Logger.
+     * @return Reference to the Logger instance.
+     */
     static Logger& getInstance();
+
+    /**
+     * @Michael-wzl
+     * @brief Set the log file name.
+     * @param filename Name of the log file.
+     */
     void setLogFile(const std::string& filename);
+
+    /**
+     * @Michael-wzl
+     * @brief Log a message with the specified log level.
+     * @param level Log level of the message.
+     * @param message Message to log.
+     */
     void log(LogLevel level, const std::string& message);
+
+    /**
+     * @Michael-wzl
+     * @brief Log an info message.
+     * @param message Info message to log.
+     */
     void info(const std::string& message);
+
+    /**
+     * @Michael-wzl
+     * @brief Log a warning message.
+     * @param message Warning message to log.
+     */
     void warning(const std::string& message);
+
+    /**
+     * @Michael-wzl
+     * @brief Log an error message.
+     * @param message Error message to log.
+     */
     void error(const std::string& message);
+
+    /**
+     * @Michael-wzl
+     * @brief Log a debug message.
+     * @param message Debug message to log.
+     */
     void debug(const std::string& message);
 
     // Formatted logging with printf-style
     template<typename... Args>
+
+    /**
+     * @Michael-wzl
+     * @brief Log a formatted message with the specified log level.
+     * @param level Log level of the message.
+     * @param format Format string (printf-style).
+     * @param args Arguments for the format string.
+     */
     void logf(LogLevel level, const char* format, Args&&... args) {
     // First determine required buffer size
     // Use snprintf with nullptr to compute needed size

@@ -11,27 +11,60 @@
 #include "Renderer.h"
 #include "ThreadSafeQueue.h"
 
-// The Admin owns write access to Map. It pulls Actions from queues,
-// validates them, applies to Map under lock, and emits RenderTasks.
+/**
+ * @Catherine135
+ * @brief The Admin owns write access to Map. It pulls Actions from queues, validates them, applies to Map under lock, and emits RenderTasks.
+ */
 class Admin {
 public:
+    /**
+     * @Catherine135
+     * @brief Constructor for Admin class.
+     * @param r Reference to the Renderer instance for submitting render tasks.
+     * @param level Initial difficulty level for map generation.
+     */
     Admin(Renderer& r, int level) 
         : map(level), r_(r) {}
-    ~Admin() { stop(); } // RAII：auto stop
+    ~Admin() { stop(); } // auto stop
 
+    /**
+     * @Catherine135
+     * @brief Start the admin loop in a separate thread.
+     */
     void start() { // start thread
         if (worker.joinable()) return;
         running = true;
         play_state = false;
         worker = std::thread(&Admin::loop, this);
     }
+
+    /**
+     * @Catherine135
+     * @brief Initialize the game state and regenerate the map at the specified level.
+     * @param level Difficulty level for map generation.
+     */
     void init(int level=1);
+
+    /**
+     * @Catherine135
+     * @brief Pause the game processing.
+     */
     void pause() {
         play_state = false;
     }
+
+    /**
+     * @Catherine135
+     * @brief Resume the game processing.
+     */
     void resume() {
         play_state = true;
     }
+
+    /**
+     * @Catherine135
+     * @brief Stop the admin loop and join the thread.
+     */
     void stop() {
         if (!worker.joinable()) return;
         running = false;
@@ -39,8 +72,26 @@ public:
         aiQ.stop();
         worker.join();
     }
+
+    /**
+     * @Catherine135
+     * @brief Submit a move action for the human player.
+     * @param m Move action to submit.
+     */
     void submit_human_action(Move& m) { humanQ.push(m); };
+
+    /**
+     * @Catherine135
+     * @brief Submit a move action for the AI player.
+     * @param m Move action to submit.
+     */
     void submit_ai_action(Move& m) { aiQ.push(m); };
+
+    /**
+     * @Catherine135
+     * @brief Get a reference to the map.
+     * @return Reference to the Map instance.
+     */
     Map& get_map() { return map;}
 
 
