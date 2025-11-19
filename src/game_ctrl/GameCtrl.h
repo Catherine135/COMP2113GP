@@ -21,7 +21,10 @@
 #define MAX_GAME_LEVEL 4
 #endif
 
-// Game Status Enumeration
+/**
+ * @Amelia-Wang-Hanyu
+ * @brief Enumeration for different game states.
+ */
 enum class GameState {
     INIT,
     PLAYING,
@@ -33,7 +36,10 @@ enum class GameState {
     GAME_MAX
 };
 
-// Player Information Structure
+/**
+ * @Amelia-Wang-Hanyu
+ * @brief Structure to hold player information.
+ */
 struct PlayerInfo {
     int id;
     std::string name;
@@ -57,28 +63,57 @@ enum class GameEvent {
 */
 class GameCtrl {
 public:
-    // Constructor and Destructor
+    /**
+     * @Amelia-Wang-Hanyu
+     * @brief Constructor for GameCtrl.
+     * @param a Reference to the Admin instance.
+     * @param r Reference to the Renderer instance.
+     * @param ai Reference to the GameAI instance.
+     * @param human Reference to the CHuman instance.
+     */
     GameCtrl(Admin& a, Renderer& r, GameAI& ai, CHuman& human);
-    // Convenience constructor: if caller doesn't provide a CHuman, GameCtrl will create and own one.
-    //GameCtrl(Admin& a, Renderer& r, GameAI& ai);
     ~GameCtrl();
 
-    // Accessor to get the current GameCtrl instance (or nullptr if none)
+    /**
+     * @brief Get the singleton instance of GameCtrl.
+     * @return Pointer to the GameCtrl instance.
+     */
     static GameCtrl* getInstance();
-     
+    
+    /**
+     * @Amelia-Wang-Hanyu
+     * @brief Initialize the game controller and its components.
+     */
     void Init(); 
 
+    /**
+     * @Amelia-Wang-Hanyu
+     * @brief Start a new game session.
+     * @param isLevelUp Indicates if the game is a level-up scenario.
+     * @param round The round number at which the game is starting.
+     */
     void StartNextLevelGame(bool isLevelUp, int round);
 
-    // User input processing
-    // -2 - error
-    // -1 exit game
-    // 0 - process success
-    // 1 - human input
+    /**
+     * @Amelia-Wang-Hanyu
+     * @brief Process user input based on the current game state.
+     * @param c Character input from the user.
+     * @return -1 to exit game, 0 for successful processing, 1 for human input, -2 for error.
+     */
     int ProcessUserInput(int c);
 
-    // Player management
+    /**
+     * @Amelia-Wang-Hanyu
+     * @brief Add a player to the game.
+     * @param player PlayerInfo structure containing player details.
+     */
     void AddPlayer(const PlayerInfo& player);
+
+    /**
+     * @Amelia-Wang-Hanyu
+     * @brief Remove a player from the game by their ID.
+     * @param player_id ID of the player to remove.
+     */
     void RemovePlayer(int player_id);
 
 private:

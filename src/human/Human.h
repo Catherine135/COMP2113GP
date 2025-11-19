@@ -16,7 +16,10 @@
 #include "Renderer.h"
 
 
-// Game Event Enumeration
+/**
+ * @Amelia-Wang-Hanyu
+ * @brief Game Event Enumeration
+ */
 enum class GameEvent {
     PLAYER_JOINED,
     PLAYER_LEFT,
@@ -30,9 +33,16 @@ enum class GameEvent {
     TILE_SELECTED
 };
 
+/**
+ * @Amelia-Wang-Hanyu
+ * @brief Class representing the human player.
+ */
 class CHuman {
 public:
-    // Constructor and Destructor
+    /**
+     * @Amelia-Wang-Hanyu
+     * @brief Constructor for CHuman class.
+     */
     CHuman(Admin& a, Renderer& r)
         : admin_(a)
         , renderer_(r)
@@ -40,13 +50,27 @@ public:
         /*, drawing_arrow_(false)*/ {}
     ~CHuman() {}
 
+    /**
+     * @Amelia-Wang-Hanyu
+     * @brief Initialize the human player state.
+     */
     void Init(); 
     
+    /**
+     * @Amelia-Wang-Hanyu
+     * @brief Get the current cursor position.
+     * @return Pair of (x, y) coordinates of the cursor.
+     */
     std::pair<int, int> GetCursorPosition() const {
         return {user_cursor_x, user_cursor_y};
     }
     
-    // User input processing
+    /**
+     * @Amelia-Wang-Hanyu
+     * @brief Process user input character.
+     * @param c Input character.
+     * @return Status code (0 for success, -1 for invalid input).
+     */
     int ProcessUserInput(int c);
 
 private:

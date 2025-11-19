@@ -12,27 +12,62 @@
 #include "Admin.h" 
 #include "Human.h"
 
+/**
+ * @Michael-wzl
+ * @brief Base class for Game AI implementations.
+ */
 class GameAI {
 public:
+    /**
+     * @Michael-wzl
+     * @brief Constructor for GameAI class.
+     * @param a Reference to the Admin instance for game state access.
+     * @param playerId ID of the AI player (default is 1).
+     */
     GameAI(Admin& a, int playerId = 1)
         : admin_(a), playerId(playerId) {}
-    virtual ~GameAI() = default;
+    virtual ~GameAI() = default; // virtual destructor
 
+    /**
+     * @Michael-wzl
+     * @brief Start the AI processing loop in a separate thread.
+     */
     void start() {
         running = true;
         play_state = false;
         worker = std::thread([this]{ this->loop(); });
     }
+
+    /**
+     * @Michael-wzl
+     * @brief Pause the AI processing.
+     */
     void pause() {
         play_state = false;
     }
+
+    /**
+     * @Michael-wzl
+     * @brief Resume the AI processing.
+     */
     void resume() {
         play_state = true;
     }
+
+    /**
+     * @Michael-wzl
+     * @brief Stop the AI processing and join the thread.
+     */
     void stop() {
         running = false;
         if (worker.joinable()) worker.join();
     }
+
+    /**
+     * @Michael-wzl
+     * @brief Initialize the AI state for a new game level.
+     * @param level Difficulty level for the game.
+     */
     void init(int level) {
         level_ = level;
         play_state = false;
@@ -61,7 +96,10 @@ private:
     int handleByAI(Move& m, int game_level=1);
 };
 
-// Random baseline AI: simple expansion with filtered neighbors and light preferences
+/**
+ * @Michael-wzl
+ * @brief Random baseline AI: simple expansion with filtered neighbors and light preferences
+ */
 class RandomAI : public GameAI {
 public:
     using GameAI::GameAI;
@@ -70,7 +108,10 @@ protected:
     Move pickMove(const std::vector<std::vector<Tile>>& snap) override;
 };
 
-// ExpanderAI: prioritize capturing opponent tiles, then neutral expansion; otherwise random valid move
+/**
+ * @Michael-wzl
+ * @brief ExpanderAI: prioritize capturing opponent tiles, then neutral expansion; otherwise random valid move
+ */
 class ExpanderAI : public GameAI {
 public:
     using GameAI::GameAI;
@@ -79,6 +120,10 @@ protected:
     Move pickMove(const std::vector<std::vector<Tile>>& snap) override;
 };
 
+/**
+ * @Michael-wzl
+ * @brief GreedyFrontierAI: strategic AI focusing on assaulting enemy capital and stacking forces
+ */
 class GreedyFrontierAI : public GameAI {
 public:
     using GameAI::GameAI;
@@ -102,9 +147,8 @@ private:
     int turnCounter{0};
     int nextAssaultTurn{0};
     std::mt19937 assaultRng{std::random_device{}()};
-    // Track last turn a tile's occupying force moved (by destination)
     std::map<std::pair<int,int>, int> lastMovedTurnByPos;
 };
 
-// Alias for existing usage in main.cpp (can extend with new heuristics later)
+// Alias for existing usage in main.cpp
 using HeuristicAI = GreedyFrontierAI;

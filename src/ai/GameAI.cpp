@@ -380,13 +380,13 @@ Move GreedyFrontierAI::planStackingMove(const std::vector<std::vector<Tile>>& sn
             if (t.isMountain()) continue;
             int nd = std::abs(nx - leader.x) + std::abs(ny - leader.y);
             if (nd >= dist) continue; // must get closer
-            // Prefer moving into our land to stack，避免消耗
+            // Prefer moving into our land to avoid overextension
             int score = 0;
             if (t.owner == playerId) score += 200;
-            else if (t.owner == -1) score += 40; // neutral is acceptable但次优
-            else score -= 200; // 不在堆叠阶段打架
-            score += dist * 3; // 更远的跟随者优先
-            score += std::min(n.movable, 30); // 更大的部队更优
+            else if (t.owner == -1) score += 40; // neutral is acceptable but less preferred
+            else score -= 200; // Not preferred to step into enemy land
+            score += dist * 3; // farther followers preferred
+            score += std::min(n.movable, 30); // larger armies preferred
             if (score > bestFollowerScore){
                 bestFollowerScore = score;
                 followerFrom = {n.x,n.y};

@@ -5,6 +5,11 @@
 /// @brief class ConsoleRenderer is responsible for processing rendering tasks
 class ConsoleRenderer {
 public:
+    /**
+     * @GHAccC
+     * @brief Process the given rendering task.
+     * @param task The rendering task to process.
+     */
     void render(const RenderTask& task);
 
 private:
