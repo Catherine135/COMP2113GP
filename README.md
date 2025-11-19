@@ -125,7 +125,7 @@ Run the following command to start the game after a successful build:
   - The `Renderer` thread renders what it receives without sending any information back to the other components.
   
     This design ensures that each component operates independently, reducing the risk of contention and improving overall performance. Also, the development can be carried out seperately, with minimal costs of communication. See the diagram below for better understanding:
-    [Diagram](docs/unidirectional_info_flow.png)
+    ![Diagram](docs/unidirectional_info_flow.png)
 
 - AI:
 
