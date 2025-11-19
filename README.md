@@ -124,7 +124,7 @@ Run the following command to start the game after a successful build:
   - The `Admin` thread processes these actions, updates `Map`, and post `RenderTask`s to the `Renderer` thread if needed.
   - The `Renderer` thread renders what it receives without sending any information back to the other components.
   
-    This design ensures that each component operates independently, reducing the risk of contention and improving overall performance. See the diagram below for better understanding:
+    This design ensures that each component operates independently, reducing the risk of contention and improving overall performance. Also, the development can be carried out seperately, with minimal costs of communication. See the diagram below for better understanding:
     [Diagram](docs/unidirectional_info_flow.png)
 
 - AI:
