@@ -70,15 +70,24 @@ Run the following command to start the game after a successful build:
 - There are 4 levels in total. Higher levels have bigger maps and stronger AI opponents.
 - Map size: `(5 + (level - 1) * 3)` rows x `(5 + (level - 1) * 3)` columns
 - AI strategy:
-  - Level 1 AI: Randomly moving armies but with restrictions on repeating moves
-  - Level 2 AI: Prioritizes expanding lands, with cleverer army usage that serves the expansion purpose
-  - Level 3 AI: Heuristic-based strategy with reward functions that encourages AI in the following order:
-    1. Capturing the player's general if found
-    2. Capturing neutral strongholds to quickly build up army size
-    3. Attacking the player's army
-    4. Concentrating armies to build a larger force for future attacks
-    5. Capturing neutral lands
-  - Level 4 AI: Heuristic-based strategy with the same reward functions as Level 3 AI, but with the strategy of organizing one primary attack every 100-150 ticks, where all armies are funneled towards the primary attack force and launched together to overwhelm the player
+  - Level 1 AI (**Random Walk Strategy**):
+    - **Core Principle**: Chaotic random expansion.
+    - **Logic**: Identifies own tiles with movable armies and randomly selects one to move to a random valid neighbor.
+    - **Behavior**: Unpredictable, often wanders within its own territory, and lacks aggression.
+  - Level 2 AI (**Basic Greedy Strategy**):
+    - **Core Principle**: Local value-based greedy expansion with logistics supply.
+    - **Logic**: Evaluates moves based on target value (Enemy Capital > Enemy City > Normal Tile). Uses BFS distance fields to flow rear armies toward the frontline. Includes anti-stagnation mechanisms to force movement.
+    - **Behavior**: Distinguishes tile importance and actively supplies the frontline. More aggressive than Level 1 but lacks long-term planning.
+  - Level 3 AI (**Aggressive Expansion Strategy**):
+    - **Core Principle**: Extreme hostility towards enemy territory, prioritizing player elimination.
+    - **Logic**: Prioritizes moves in the order: Capture Enemy -> Capture Neutral -> Others. Uses efficient army control (sending `enemy_army + 1`) to conserve troops while expanding rapidly.
+    - **Behavior**: Expands like a virus and attacks efficiently upon contact.
+  - Level 4 AI (**Advanced Strategic Strategy**):
+    - **Core Principle**: Level 2 base strategy augmented with macro army assembly and periodic assaults.
+    - **Logic**:
+      - **Periodic Assault**: Every 100-150 turns, if the enemy capital is known, plans a direct assault path.
+      - **Army Stacking**: Identifies large armies and merges them into a massive "leader" stack (Deathball) moving toward the enemy.
+    - **Behavior**: Demonstrates macro strategy by building massive forces to overwhelm the player directly.
 
 ## Highlights
 
