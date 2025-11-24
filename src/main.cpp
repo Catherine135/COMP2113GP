@@ -210,6 +210,6 @@ int main() {
     // End ncurses mode after renderer fully stops to keep UI intact until exit
     endwin();
 
-    std::cout << "What a fight! You are a good Jeo." << std::endl;
+    std::cout << "What a fight! You are a good Joe." << std::endl;
     return 0;
 }
