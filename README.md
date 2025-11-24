@@ -10,10 +10,9 @@ This repo requires only standard C++ libraries to build and run. However, for WS
 sudo apt install libncurses5-dev
 ```
 
-For MacOS and Ubuntu users, the `ncurses` library should already be included in the standard libraries. Running the following commands in your terminal will build the project:
+For MacOS and Ubuntu users, the `ncurses` library should already be included in the standard libraries. Running the following commands in your terminal under the project root will build the project:
 
 ```bash
-git clone https://github.com/Catherine135/COMP2113GP && cd COMP2113GP
 make -j4
 ```
 
@@ -130,6 +129,12 @@ Run the following command to start the game after a successful build:
 - AI:
 
     The game features AI opponents with varying strategies based on the selected difficulty level. The AI logic is encapsulated in the `GameAI` class, which generates actions for the AI player based on the current game state. Different strategies are implemented for each difficulty level, ranging from random movements to heuristic-based decision-making. [Code](src/core/GameAI.h)
+
+    Hint: You can observe AI's moves by changing [SHOW_AI_TILES](src/render/ConsoleRenderer.cpp#L11) from `false` to `true`. Remember to recompile with:
+
+    ```bash
+    make clean && make -j4
+    ```
 
 ## Acknowledgements
 
