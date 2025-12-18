@@ -1,6 +1,6 @@
 # COMP2113 Group Project: Generals.ai
 
-This is a C++ implementation of the game [Generals.io](https://generals.io/), developed as a group project for the course COMP2113 at the University of Hong Kong. In this game, the player controls an army with the objective of capturing the opponent's, aka the AI's, general while defending their own. With war fog obscuring the battlefield, mountains cutting off paths, and neural strongholds getting in the way, strategic planning and balance between expansion and defense are crucial for victory. The player will have to find the enemy general while navigating the map and fighting off the enemy AI.
+This is a C++ implementation of the game [Generals.io](https://generals.io/) that has AI players, can be played within the terminal, and relies only on C++ STL. It's developed as a group project for the course COMP2113 at the University of Hong Kong. In this game, the player controls an army with the objective of capturing the opponent's, aka the AI's, general while defending their own. With war fog obscuring the battlefield, mountains cutting off paths, and neural strongholds getting in the way, strategic planning and balance between expansion and defense are crucial for victory. The player will have to find the enemy general while navigating the map and fighting off the enemy AI.
 
 ## How to build and run
 
